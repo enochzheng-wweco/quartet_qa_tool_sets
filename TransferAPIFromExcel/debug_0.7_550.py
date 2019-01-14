@@ -59,9 +59,7 @@ class TransferAPIFromExcel():
             r_data_start = r.find('{')
             r_data_end = r.find('}')
             data = r[r_data_start:r_data_end+1].strip()
-            # print (str(i)+" print data "+"="*10)
-            # print(data)
-            # print (str(i)+" data finish"+"="*10)
+            
             if not self.get_is_json(data):
                 print("[err_3]: response data format err")
                 data = {"[err]": "response data format err"}
@@ -210,16 +208,6 @@ class TransferAPIFromExcel():
 
         """
         output_str = input_str.strip().replace('\\n','').replace('\\','').replace('\\','').replace("“","\"").replace("”","\"")
-        return output_str
-
-    def str_custom_strip_code(self, input_str):
-        """
-        put custom strip and replace to string here
-        not replacing spaces in the middle
-
-        """
-        output_str = input_str.strip().replace('\\n','').replace('\\','').replace('\\','').replace("“","\"").replace("”","\"")
-        output_str = output_str.replace("，",",").replace(":","").replace("\"","").replace("\'","")
         return output_str
 
     def strip_title_by_col_name(self, col_name):
