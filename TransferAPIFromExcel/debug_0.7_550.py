@@ -59,7 +59,7 @@ class TransferAPIFromExcel():
             r_data_start = r.find('{')
             r_data_end = r.find('}')
             data = r[r_data_start:r_data_end+1].strip()
-            
+
             if not self.get_is_json(data):
                 print("[err_3]: response data format err")
                 data = {"[err]": "response data format err"}
