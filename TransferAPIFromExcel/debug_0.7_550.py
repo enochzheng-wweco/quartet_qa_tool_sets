@@ -178,10 +178,7 @@ class TransferAPIFromExcel():
         # print(input_str)
         # print("response body finish" + "=" * 10)
 
-        # i don't know if this is needed
-        # input_str = "".join(input_str.split())
-
-        # Problem - TODO - often error here
+        # often error here
         if self.get_is_json(input_str):
             js = json.loads(input_str)
             js_output = json.dumps(js, sort_keys=False, indent=4)
@@ -320,16 +317,6 @@ class TransferAPIFromExcel():
 
     def generate_one_test_data_file(self,wb,title_col,response_data_col):
         pass
-        # # get title list
-        # title_blob = self.strip_title_by_col_name(title_col)
-        #
-        # # data input to template
-        # response_blob = self.strip_response_data_by_col_name(response_data_col)
-        # r = self.fill_in_template_response(response_blob, 'case_test_data.json')
-        #
-        # # output to file
-        # self.output_to_file(title_blob, r, 'case_test_data_new.json')
-
 
 
 if __name__ == "__main__":
