@@ -285,7 +285,8 @@ class TransferAPIFromExcel():
             if not raw.value:
                 raw.value = "Empty test case name"
             r = raw.value.strip()
-            r = r.replace("\n","").replace(": ","_").replace(":","_").replace(" ", "_")
+            r = r.replace("\n","_").replace(": ","_").replace(":","_").replace(" ", "_").replace(",","_")
+            r = r.replace("__","_")
             title_list.append(r)
 
         for i in range(0,len(title_list)):
