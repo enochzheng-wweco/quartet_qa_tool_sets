@@ -1,0 +1,30 @@
+
+    {
+        "validation_list": [
+            {
+                "validations": {
+                    statusCode ,
+                    responseBody
+                }
+            }
+        ],
+        "parameter_list": [
+            {
+                "parameters": {
+                    "auth": {
+                        "pwd": "Testvxrail123!",
+                        "user": "administrator@vsphere.local"
+                    },
+                    "request_body":{
+                    }
+                }
+            }
+        ],
+        "metadata": {
+            "author": "Automation",
+            "type": "api",
+            "id": 1,
+            "description": "enable_logical_view"
+        }
+    }
+
