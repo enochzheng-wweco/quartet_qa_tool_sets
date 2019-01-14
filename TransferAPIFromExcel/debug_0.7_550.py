@@ -3,6 +3,7 @@ import time
 
 import openpyxl
 import json
+import re
 
 # @Date:Jan 2019
 # @Author: Enoch
@@ -27,17 +28,14 @@ class TransferAPIFromExcel():
 
     def strip_response_data_by_col_name(self, col_name):
         """
-        after get col id, in this def we will strip response data
-
-        this function is a mess, cause response code/data is variously ugly
+        after get col id, in this funtion we will strip response data, and now using re is better
 
         response is a 2-dimension list with code list and data list inside
         """
         col_id = self.get_col_id_by_name(col_name)
         # print (col_id)
-        code_list=[]
-        data_list=[]
-
+        code_list = []
+        data_list = []
         # TODO
         for i in range(1, self.col_length):
             raw = self.ws.cell(row=i, column=col_id)
@@ -49,55 +47,12 @@ class TransferAPIFromExcel():
 
             # Try to strip response code
             # here is to find start/stop point
-            r_code_start = r.find('code')
-            r_code = r[r_code_start:]
-            if self.get_is_number(r_code):
-                pass
-            elif r_code.find('\n'):
-                r_code_end = r.find('\n')
-            elif r_code.find(' '):
-                r_code_end = r.find(',')
-            elif r_code.find(','):
-                r_code_end = r.find(',')
-            elif self.get_is_number(r[-1]):
-                r_code_end = -1
+            regex = r"[0-9]{3,5}"
+            m = re.search(regex, r)
+            if m:
+                code = m.group(0)
             else:
-                print("[err_2]: response code format err")
-                break
-            # after get raw code, here is to strip response code
-            code = r_code[0:r_code_end]
-            code = code.replace('code', '')
-            code = self.str_custom_strip_code(code)
-            # print (code)
-            if self.get_is_number(code):
-                pass
-            elif code.find(' '):
-                x = code.find(' ')
-                code = code[0:x].strip()
-            elif code.find(','):
-                x = code.find(',')
-                code = code[0:x].strip()
-
-            if self.get_is_number(code):
-                pass
-            elif code.find(','):
-                x = code.find(',')
-                code = code[0:x]
-            elif code.find(' '):
-                x = code.find(' ')
-                code = code[0:x]
-            elif code.find('\n'):
-                x = code.find('\n')
-                code = code[0:x]
-            else:
-                break
-
-            # to fix 200\n\nres problem
-            if self.get_is_number(code):
-                pass
-            elif code.find('\n'):
-                x = code.find('\n')
-                code = code[0:x]
+                code = 0
             code_list.append(code)
 
             # dealing with data now
@@ -115,7 +70,6 @@ class TransferAPIFromExcel():
 
         response_data = [code_list, data_list]
         return response_data
-
 
     def fill_in_template_response(self,input_list,file_name):
         """
@@ -139,9 +93,9 @@ class TransferAPIFromExcel():
                 if "statusCode" in line:
                     if code_list[i] is "":
                         code_list[i] = "0"
-                    else:
-                        code_list[i].replace('code','').strip()
-                    line = line.replace("statusCode", '"statusCode"'+': '+ code_list[i])
+
+                    line = line.replace("statusCode", '"statusCode"'+': '+ str(code_list[i]))
+
                 if "responseBody" in line:
                     if '{' not in response_body_list[i]:
                         response_body_list[i] = '{}'
@@ -174,9 +128,6 @@ class TransferAPIFromExcel():
 
         input_str = ''.join(input_list)
         input_str = self.str_custom_strip(input_str)
-        # print("response body"+"="*10)
-        # print(input_str)
-        # print("response body finish" + "=" * 10)
 
         # often error here
         if self.get_is_json(input_str):
