@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import time
 
 import openpyxl
@@ -8,14 +9,15 @@ import re
 # @Date:Jan 2019
 # @Author: Enoch
 # @Description: this tool is to transfer excel file to API test cases, now we just do data.
+# @Usage: put .xlsx file in the same path with .py file and run:
+# python3 transfer_api_from_excel.py
 
 
 class TransferAPIFromExcel():
-    def __init__(self):
-        # default value, can be overwrite later
-        self.wb = openpyxl.load_workbook('./example.xlsx')
-        self.ws = self.wb['market']
-        self.col_length = self.get_col_length_by_col_id('Test Name')
+    def __init__(self, ws_name, wb_name, title_col):
+        self.wb = openpyxl.load_workbook(ws_name)
+        self.ws = self.wb[wb_name]
+        self.col_length = self.get_col_length_by_col_id(title_col)
 
     def get_col_id_by_name(self, col_name):
         """
@@ -25,6 +27,7 @@ class TransferAPIFromExcel():
             row = self.ws.cell(row=1, column=index)
             if row.value and col_name in row.value:
                 return index
+        return False
 
     def strip_response_data_by_col_name(self, col_name):
         """
@@ -36,7 +39,6 @@ class TransferAPIFromExcel():
         # print (col_id)
         code_list = []
         data_list = []
-        # TODO
         for i in range(1, self.col_length):
             raw = self.ws.cell(row=i, column=col_id)
             if not raw.value:
@@ -87,7 +89,6 @@ class TransferAPIFromExcel():
             #  read a template file repeatedly, marked TODO
             f = open(file_name, 'r')
             for line in f:
-                # TODO
                 if "statusCode" in line:
                     if code_list[i] is "":
                         code_list[i] = "0"
@@ -252,29 +253,81 @@ class TransferAPIFromExcel():
         else:
             return str(num)
 
-    def loop_ws_in_wb(self, wb):
-        pass
+class LoopExcelWsWb():
 
-    def generate_one_test_data_file(self,wb,title_col,response_data_col):
-        pass
+    def get_ws_list(self):
+        """
+        get .xlsx file list from current path
+        """
+        path = os.getcwd()
+        excel_list = []
 
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                if ".xlsx" in f:
+                    excel_list.append(f)
+
+        return excel_list
+
+    def get_wb_list(self, ws_name):
+        """
+        get worksheet list from input .xlsx file
+        """
+        ws = openpyxl.load_workbook(ws_name)
+        return ws.worksheets
+
+    def get_ws_and_wb_list(self):
+        """
+        get a 2-dimension [ws, wb] list 
+        """
+        ws_list = self.get_ws_list()
+        ws_and_wb_list=[]
+        for ws_name in ws_list:
+            ws = openpyxl.load_workbook(ws_name)
+            for wb in ws.worksheets:
+                wb_name = wb.title
+                ws_and_wb_list.append([ws_name,wb_name])
+        print (ws_and_wb_list)
+        return ws_and_wb_list
+
+    def get_col_id_by_name(self, ws, col_name):
+        """
+        input column name, i.e. 'Expected Result', to output col id for further operations
+        """
+        for index in range(1, 100):
+            row = ws.cell(row=1, column=index)
+            if row.value and col_name in row.value:
+                return index
+        return False
 
 if __name__ == "__main__":
-    response_data_col = 'Expected Result'
-    title_col = 'Test Name'
-    t = TransferAPIFromExcel()
+    l = LoopExcelWsWb()
+    blob_list = l.get_ws_and_wb_list()
 
-    # t.generate_one_test_data_file(wb, title_col, response_data_col)
+    for w in blob_list:
+        ws_name = w[0]
+        wb_name = w[1]
+        response_data_col = 'Expected Result'
+        title_col = 'Test Name'
 
-    # get title list
-    title_blob = t.strip_title_by_col_name(title_col)
+        wb = openpyxl.load_workbook(ws_name)
+        ws = wb[wb_name]
 
-    # data input to template
-    response_blob = t.strip_response_data_by_col_name(response_data_col)
-    r = t.fill_in_template_response(response_blob,'case_test_data.json')
+        if l.get_col_id_by_name(ws,title_col) is not False:
+            t = TransferAPIFromExcel(ws_name, wb_name, title_col)
 
-    # output to file
-    t.output_to_file(title_blob, r, 'case_test_data_new.json')
+            # get title list
+            title_blob = t.strip_title_by_col_name(title_col)
+
+            # data input to template
+            response_blob = t.strip_response_data_by_col_name(response_data_col)
+            r = t.fill_in_template_response(response_blob,'case_test_data.json')
+
+            # output to file
+            ws_name_strip = ws_name.strip(".xlsx").replace(" ","_")
+            wb_name_strip = wb_name.replace(" ", "_")
+            t.output_to_file(title_blob, r, ws_name_strip +"_"+ wb_name_strip + '_case_test_data.json')
+
 
 
 
