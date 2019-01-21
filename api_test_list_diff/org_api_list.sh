@@ -1,2 +1,2 @@
-cd /Users/enochzheng/Workspaces/emc/VxRailProjects;
-find ./ -type f -name "setTestsuitePool_api_short*" | xargs grep "loadTestsFromTestCase"
+cd /home/emc/Workspaces/VxRailProjects;
+find ./ -type f -name "setTestsuitePool_api_*" | xargs grep "loadTestsFromTestCase"

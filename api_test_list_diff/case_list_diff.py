@@ -7,8 +7,12 @@ Usage:
 2.change path on 2 .sh files.
 3.run .py file
 """
+import datetime
 import subprocess
 
+def code_update():
+    (status, output) = subprocess.getstatusoutput('cd ../VxRailProjects-code && pwd && git pull')
+    return output
 
 def api_list():
     (status, output) = subprocess.getstatusoutput('./api_list.sh')
@@ -45,11 +49,21 @@ def org_api_list():
     return name_list
 
 if __name__ == "__main__":
+    currentTime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    u = code_update()
+    print(u)
+
+    f = open('api_diff_'+currentTime+".txt", 'w')
     new = api_list()
-    print (new)
+    print(new)
     org = org_api_list()
     print(org)
+
     for i in new:
         if i not in org:
-            print (i)
+            print(i, file=f)
+
+    f.close()
+
 

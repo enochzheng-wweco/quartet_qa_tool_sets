@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-import os
-import time
-
-import openpyxl
-import json
-import re
-
 # @Date:Jan 2019
 # @Author: Enoch
 # @Description: this tool is to transfer excel file to API test cases, now we just do data.
 # @Usage: put .xlsx file in the same path with .py file and run:
 # python3 transfer_api_from_excel.py
 
+import os
+import time
+
+import openpyxl
+import json
+import re
 
 class TransferAPIFromExcel():
     def __init__(self, ws_name, wb_name, title_col):
