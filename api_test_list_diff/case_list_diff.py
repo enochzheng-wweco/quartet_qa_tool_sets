@@ -9,6 +9,7 @@ Usage:
 """
 import datetime
 import subprocess
+import time
 
 def code_update():
     (status, output) = subprocess.getstatusoutput('cd ../VxRailProjects-code && pwd && git pull')
@@ -52,18 +53,17 @@ if __name__ == "__main__":
     currentTime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     u = code_update()
-    print(u)
+    print (u)
 
     f = open('api_diff_'+currentTime+".txt", 'w')
     new = api_list()
-    print(new)
+    print (new)
     org = org_api_list()
     print(org)
 
     for i in new:
         if i not in org:
-            print(i, file=f)
+            print (i, file=f)
 
     f.close()
-
 
